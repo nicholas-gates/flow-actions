@@ -3,8 +3,8 @@ name: Enforce PR Labels
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize, reopened]
-  pull_request_review:
-    types: [submitted, edited, dismissed]
+#   pull_request_review:
+#     types: [submitted, edited, dismissed]
 
 jobs:
   check-release-type-labels:
