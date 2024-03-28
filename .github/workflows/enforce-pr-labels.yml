@@ -1,0 +1,41 @@
+name: Enforce PR Labels
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, reopened]
+#   pull_request_review:
+#     types: [submitted, edited, dismissed]
+
+jobs:
+  check-release-type-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for at least one release-type label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const requiredLabels = ['bug', 'feature']; // Define required labels here
+            const prLabels = context.payload.pull_request.labels.map(label => label.name);
+
+            const hasAtLeastOneRequiredLabel = requiredLabels.some(label => prLabels.includes(label));
+
+            if (!hasAtLeastOneRequiredLabel) {
+              core.setFailed(`PR must have at least one of these labels for placement in release notes: ${requiredLabels.join(', ')}`);
+            }
+
+  check-version-labels:
+    needs: check-release-type-labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for at least one release-type label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const requiredLabels = ['patch', 'minor', 'major']; // Define required labels here
+            const prLabels = context.payload.pull_request.labels.map(label => label.name);
+
+            const hasAtLeastOneRequiredLabel = requiredLabels.some(label => prLabels.includes(label));
+
+            if (!hasAtLeastOneRequiredLabel) {
+              core.setFailed(`Also, PR must have at least one of these labels for auto bumping of the release version number: ${requiredLabels.join(', ')}`);
+            }
